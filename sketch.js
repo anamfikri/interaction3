@@ -54,7 +54,7 @@ class Grass {
 
     this.targetAngle = this.baseBend;
 
-    this.firmness = 0.80;
+    this.firmness = 0.75;
 
     this.color = lerpColor(color('#225400'), color('#B2D186'), random());
 
@@ -63,6 +63,12 @@ class Grass {
     this.flowerColor = random(['#F44366',  '#BA68C8', '#EC407A']);
 
     this.windOffset = random(TWO_PI);
+
+    this.strokeWeight = 1.2;
+
+    let index = floor(random(4));
+    this.soilWidth = 6 + (index * 2);
+    this.soilThickness = 0.5;
   }
 
   update(dy) {
@@ -73,8 +79,8 @@ class Grass {
     this.targetAngle += windDir;
 
     let d = dist(mouseX, mouseY, this.base.x, this.base.y);
-    if (d < 20) {
-      let localForce = map(d, 0, 20, 0.20, 0);
+    if (d < 50) {
+      let localForce = map(d, 0, 50, 0.30, 0);
 
       localForce *= (windDir >= 0 ? 1 : -1);
 
@@ -93,9 +99,6 @@ class Grass {
 
   display() {
 
-    stroke(this.color);
-    strokeWeight(1.2);
-
     strokeCap(SQUARE);
 
     let tipX = this.base.x + sin(this.angle) * this.len;
@@ -110,6 +113,15 @@ class Grass {
       this.base.y - 2 * this.len / 2
     );
 
+    stroke(255);
+    strokeWeight(this.strokeWeight + 1);
+    beginShape();
+    vertex(this.base.x, this.base.y);
+    bezierVertex(ctrl1.x, ctrl1.y, ctrl2.x, ctrl2.y, tipX, tipY);
+    endShape();
+
+    stroke(this.color);
+    strokeWeight(this.strokeWeight);
     beginShape();
     vertex(this.base.x, this.base.y);
     bezierVertex(ctrl1.x, ctrl1.y, ctrl2.x, ctrl2.y, tipX, tipY);
@@ -117,12 +129,16 @@ class Grass {
 
     noStroke();
     fill(this.color);
-    circle(tipX, tipY, 1.2);
+    circle(tipX, tipY, 1.8);
 
     if (this.flower) {
       fill(this.flowerColor);
       circle(tipX, tipY, 2.5);
     }
+
+    stroke('#E9CCAF');
+    strokeWeight(this.soilThickness);
+    line(this.base.x - this.soilWidth/2, this.base.y, this.base.x + this.soilWidth/2, this.base.y);
   }
 }
 
