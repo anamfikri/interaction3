@@ -13,7 +13,7 @@ function setup() {
 }
 
 function draw() {
-  background(255);
+  clear();
 
   let dx = mouseX - prevMouseX;
   let dy = mouseY - prevMouseY;
