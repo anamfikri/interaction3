@@ -10,6 +10,7 @@ function setup() {
 
   prevMouseX = mouseX;
   prevMouseY = mouseY;
+  frameRate(15);
 }
 
 function draw() {
