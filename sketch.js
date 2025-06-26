@@ -2,8 +2,13 @@ let grasses = [];
 
 let prevMouseX;
 let prevMouseY;
-
 let windDir = 0;
+const MAX_GRASSES = 5000;
+let grassIdCounter = 0;
+
+let frameCounter = 0;
+const SORT_FREQUENCY = 5;
+const BACKGROUND_UPDATE_FREQUENCY = 10;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -14,7 +19,7 @@ function setup() {
 }
 
 function draw() {
-  clear();
+  background(255);
 
   let dx = mouseX - prevMouseX;
   let dy = mouseY - prevMouseY;
@@ -39,12 +44,27 @@ function mouseDragged() {
 
 function addGrass(x, y, count) {
   for (let i = 0; i < count; i++) {
-    grasses.push(new Grass(x + random(-20, 20), y + random(-20, 20)));
+    if (grasses.length >= MAX_GRASSES) {
+      let oldestIndex = 0;
+      let oldestId = grasses[0].id;
+      
+      for (let j = 1; j < grasses.length; j++) {
+        if (grasses[j].id < oldestId) {
+          oldestId = grasses[j].id;
+          oldestIndex = j;
+        }
+      }
+      
+      grasses.splice(oldestIndex, 1);
+    }
+    grasses.push(new Grass(x + random(-20, 20), y + random(-20, 20), grassIdCounter++));
   }
 }
 
+
 class Grass {
-  constructor(x, y) {
+  constructor(x, y, id) {
+    this.id = id;
     this.base = createVector(x, y);
 
     this.len = random(15, 55);
@@ -68,8 +88,8 @@ class Grass {
     this.strokeWeight = 1.2;
 
     let index = floor(random(4));
-    this.soilWidth = 6 + (index * 2);
-    this.soilThickness = 0.5;
+    this.soilWidth = 4 + (index * 2);
+    this.soilThickness = 1.2;
   }
 
   update(dy) {
@@ -99,6 +119,12 @@ class Grass {
   }
 
   display() {
+    this.displaySoil();
+    this.displayGrass();
+  }
+  
+  displayGrass() {
+    noFill();
 
     strokeCap(SQUARE);
 
@@ -106,12 +132,13 @@ class Grass {
     let tipY = this.base.y - this.len;
 
     let ctrl1 = createVector(
-      this.base.x + sin(this.angle) * this.len * 0.3,
-      this.base.y - this.len / 3
+    this.base.x + sin(this.angle) * this.len * 0.25,
+    this.base.y - this.len * 0.5
     );
+
     let ctrl2 = createVector(
-      this.base.x + sin(this.angle) * this.len * 0.8,
-      this.base.y - 2 * this.len / 2
+    this.base.x + sin(this.angle) * this.len * 0.6,
+    this.base.y - this.len * 0.9
     );
 
     stroke(255);
@@ -130,16 +157,19 @@ class Grass {
 
     noStroke();
     fill(this.color);
-    circle(tipX, tipY, 1.8);
+    circle(tipX, tipY, 1);
 
     if (this.flower) {
       fill(this.flowerColor);
-      circle(tipX, tipY, 2.5);
+      circle(tipX, tipY, 2.2);
     }
 
-    stroke('#E9CCAF');
-    strokeWeight(this.soilThickness);
-    line(this.base.x - this.soilWidth/2, this.base.y, this.base.x + this.soilWidth/2, this.base.y);
+}
+  
+ displaySoil() {
+  noStroke();
+    fill('#E9CCAF');
+    ellipse(this.base.x, this.base.y, this.soilWidth, this.soilWidth * 0.18);
   }
 }
 
